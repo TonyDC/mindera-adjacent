@@ -1,4 +1,5 @@
 import json
+import argparse
 
 ACTIVE_ELEMENT = 1
 
@@ -11,14 +12,12 @@ ACTIVE_ELEMENT = 1
 #                 [0, 0, 0, 1, 0, 0, 1, 1]]
 
 
-def process_matrix(matrix: list, width: int) -> list:
+def process_matrix(file, width: int) -> list:
     previous_line_groups = [-1 for _ in range(width)]
     groups = []
     current_height = 0
 
-    while len(matrix) > 0:
-        row = matrix.pop(0)
-
+    for row in process_row_string(file):
         for i in range(width):
             if row[i] == ACTIVE_ELEMENT:
                 previous_line_group = previous_line_groups[i]
@@ -63,9 +62,30 @@ def process_matrix(matrix: list, width: int) -> list:
     return groups
 
 
-input_matrix = json.load(open('matrices/10000x10000.json'))
-matrix_width = len(input_matrix[0])
+def print_groups(groups: list) -> None:
+    for group in groups:
+        if len(group) > 1:
+            print(group)
 
-result = process_matrix(input_matrix, matrix_width)
-# for group in result:
-#    print(group)
+
+def process_row_string(file):
+    for line in file:
+        row_string = line.strip()
+        if row_string.endswith("],"):
+            row_string = row_string[:-1]
+        if len(row_string) > 1:
+            yield json.loads(row_string)
+
+
+# arguments: filename width
+
+parser = argparse.ArgumentParser(description='Find adjacent cells in a matrix')
+parser.add_argument('filename', metavar='file', action='store', type=str,
+                    help='path to matrix file')
+
+parser.add_argument('width', metavar='width', type=int, action='store',
+                    help='the width of the matrix')
+
+args = parser.parse_args()
+with open(args.filename) as matrix_file:
+    print_groups(process_matrix(matrix_file, args.width))

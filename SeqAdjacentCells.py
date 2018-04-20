@@ -18,6 +18,11 @@ def process_matrix(file, width: int) -> list:
     current_height = 0
 
     for row in process_row_string(file):
+        row_length = len(row)
+        if row_length != width:
+            raise ValueError(
+                "the width of the matrix ({}) is not the same as the supplied one ({})".format(row_length, width))
+
         for i in range(width):
             if row[i] == ACTIVE_ELEMENT:
                 previous_line_group = previous_line_groups[i]
@@ -83,5 +88,11 @@ parser.add_argument('filename', metavar='file', action='store', type=str, help='
 parser.add_argument('width', metavar='width', type=int, action='store', help='the width of the matrix')
 
 args = parser.parse_args()
-with open(args.filename) as matrix_file:
-    print_groups(process_matrix(matrix_file, args.width))
+
+try:
+    with open(args.filename) as matrix_file:
+        print_groups(process_matrix(matrix_file, args.width))
+except FileNotFoundError as e:
+    print(e)
+except ValueError as e:
+    print(e)

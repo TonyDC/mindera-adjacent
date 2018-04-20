@@ -68,7 +68,7 @@ def print_groups(groups: list) -> None:
             print(group)
 
 
-def process_row_string(file):
+def process_row_string(file) -> list:
     for line in file:
         row_string = line.strip()
         if row_string.endswith("],"):
@@ -77,14 +77,10 @@ def process_row_string(file):
             yield json.loads(row_string)
 
 
-# arguments: filename width
-
-parser = argparse.ArgumentParser(description='Find adjacent cells in a matrix')
-parser.add_argument('filename', metavar='file', action='store', type=str,
-                    help='path to matrix file')
-
-parser.add_argument('width', metavar='width', type=int, action='store',
-                    help='the width of the matrix')
+# parse arguments: filename width
+parser = argparse.ArgumentParser(description='Find adjacent cells in a 2D matrix')
+parser.add_argument('filename', metavar='file', action='store', type=str, help='path to file containing the matrix')
+parser.add_argument('width', metavar='width', type=int, action='store', help='the width of the matrix')
 
 args = parser.parse_args()
 with open(args.filename) as matrix_file:

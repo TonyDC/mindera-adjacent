@@ -10,4 +10,4 @@ This Python script outputs all groups of adjacent cells, given a 2-D matrix cons
 
 
 ## Usage
-```py SeqAdjacentCells.py <path to file containing the matrix> <width of the matrix>```
+```py main.py <path to file containing the matrix>```

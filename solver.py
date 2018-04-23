@@ -19,6 +19,7 @@ class Solver:
         self.__current_height = 0
         self.__is_matrix_processed = False
         self.__filename = filename
+        self.__equivalent_groups = []
 
     def __process_matrix(self) -> None:
         for row in self.__process_row_string():
@@ -44,15 +45,22 @@ class Solver:
         self.__is_matrix_processed = True
 
     def __update_indices(self, old_index, new_index) -> None:
-        for i in range(len(self.__previous_line_groups)):
-            if self.__previous_line_groups[i] == old_index:
-                self.__previous_line_groups[i] = new_index
+        if self.__equivalent_groups[old_index] != new_index:
+            self.__equivalent_groups[old_index] = new_index
+            self.__update_indices(old_index, self.__equivalent_groups[new_index])
 
     def __add_cell_to_group(self, group_id, row, column) -> None:
         self.__groups[group_id].append([row, column])
 
     def __process_active_element(self, i) -> None:
         previous_line_group = self.__previous_line_groups[i]
+
+        # Update group ID if necessary (e.g. a merge was performed)
+        if -1 < previous_line_group != self.__equivalent_groups[previous_line_group]:
+            # Check whether the current group update was changed in the meanwhile
+            self.__update_indices(previous_line_group,
+                                  self.__equivalent_groups[self.__equivalent_groups[previous_line_group]])
+            previous_line_group = self.__previous_line_groups[i] = self.__equivalent_groups[previous_line_group]
 
         # if the first element in the row is connected to the above cell
         if i == 0 and previous_line_group > -1:
@@ -98,6 +106,7 @@ class Solver:
 
     def __create_group(self, i) -> None:
         self.__groups.append([[self.__current_height, i]])
+        self.__equivalent_groups.append(self.__nr_created_groups)
         self.__previous_line_groups[i] = self.__nr_created_groups
         self.__nr_created_groups += 1
 
